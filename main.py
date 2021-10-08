@@ -40,7 +40,7 @@ b = gen_right_vector(x, y)
 a0, a1, a2 = np.linalg.solve(A, b)
 #
 # 生成拟合曲线的绘制点
-_X = np.arange(0, 5, 0.1)
+_X = np.arange(0, 1, 0.01)
 _Y = np.array([a0 + a1 * x + a2 * x ** 2 for x in _X])
 
 plt.plot(x, y, 'ro', _X, _Y, 'b', linewidth=2)
