@@ -45,5 +45,4 @@ _Y = np.array([a0 + a1 * x + a2 * x ** 2 for x in _X])
 
 plt.plot(x, y, 'ro', _X, _Y, 'b', linewidth=2)
 plt.title("y = {} + {}x + {}$x^2$ ".format(a0, a1, a2))
-plt.axis([-0.1, 1.1, 1.1, 3.1])
 plt.show()
