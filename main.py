@@ -34,7 +34,7 @@ def gen_right_vector(X, Y, omega):
 
 #--------------19:20
 
-b2, b1, b0=np.polyfit(x,y,2)
+b2, b1, b0=np.polyfit(x,y)
 
 #--------------
 #'''
@@ -55,3 +55,15 @@ plt.plot(x, y, 'ro', X, Y)
 plt.plot(x, y, 'ro', X, Y2)
 #plt.title("y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
 plt.show()
+
+
+##
+'''
+p0(x)=1
+p1(x)=x-a0
+p2(x)=(x-a1)p1(x)-b1p0(x)
+
+a0=
+a1=
+b1=
+'''
