@@ -33,8 +33,9 @@ def gen_right_vector(X, Y, omega):
     return b
 
 #--------------19:20
-reg=np.polyfit(x,y,2)
-print(reg)
+
+b2, b1, b0=np.polyfit(x,y,2)
+
 #--------------
 #'''
 A = gen_coefficient_matrix(x, ω)
@@ -45,11 +46,12 @@ print(b)
 a0, a1, a2 = np.linalg.solve(A, b)
 print('a0=', a0, 'a1=', a1, 'a2=', a2)
 
+#'''
 # 拟合曲线描点
 X = np.arange(0, 1, 0.01)
 Y = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
-
-plt.plot(x, y, 'ro', X, Y, 'b')
-plt.title("y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
+Y2 = np.array([b0 + b1 * x + b2 * x ** 2 for x in X])
+plt.plot(x, y, 'ro', X, Y)
+plt.plot(x, y, 'ro', X, Y2)
+#plt.title("y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
 plt.show()
-#'''
