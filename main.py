@@ -32,7 +32,11 @@ def gen_right_vector(X, Y, omega):
         b.append(sum(omega * (X ** i * Y)))  # ω*x^i*y
     return b
 
-
+#--------------19:20
+reg=np.polyfit(x,y,2)
+print(reg)
+#--------------
+#'''
 A = gen_coefficient_matrix(x, ω)
 b = gen_right_vector(x, y, ω)
 print(A)
@@ -48,3 +52,4 @@ Y = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
 plt.plot(x, y, 'ro', X, Y, 'b')
 plt.title("y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
 plt.show()
+#'''
