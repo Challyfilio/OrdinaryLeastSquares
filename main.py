@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy
 
+# data
 x = np.array([0, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
 y = np.array([1.2, 1.5, 1.7, 2, 2.24, 2.4, 2.75, 3])
 ω = np.array([1, 1, 50, 1, 1, 1, 1, 1])
@@ -9,7 +11,7 @@ y = np.array([1.2, 1.5, 1.7, 2, 2.24, 2.4, 2.75, 3])
 # plt.scatter(x, y, marker='o')
 # plt.show()
 
-# 解方程
+# 解方程 AX=b
 # 系数矩阵A
 def gen_coefficient_matrix(X, omega):
     m = 3
@@ -32,38 +34,57 @@ def gen_right_vector(X, Y, omega):
         b.append(sum(omega * (X ** i * Y)))  # ω*x^i*y
     return b
 
-#--------------19:20
 
-b2, b1, b0=np.polyfit(x,y)
-
-#--------------
-#'''
 A = gen_coefficient_matrix(x, ω)
 b = gen_right_vector(x, y, ω)
-print(A)
-print(b)
+# print(A)
+# print(b)
 
 a0, a1, a2 = np.linalg.solve(A, b)
-print('a0=', a0, 'a1=', a1, 'a2=', a2)
 
-#'''
+
+# 正交多项式
+def MathFunc(x, y, omega):
+    gram_list_all = []
+    d_list = []
+
+    for i in range(2 * 2 + 1):
+        gram_list_each = 0
+        for x_i, w_i in zip(x, omega):
+            gram_list_each += w_i * (x_i ** i)
+        gram_list_all.append(gram_list_each)
+    for i in range(3):
+        t = 0
+        for x_i, f_i, w_i in zip(x, y, omega):
+            t += w_i * (x_i ** i) * f_i
+        d_list.append(t)
+    return gram_list_all, d_list
+
+
+g, d = MathFunc(x, y, ω)
+# print(g)
+# print(d)
+
+cal0 = sympy.symbols('0')
+cal1 = sympy.symbols('1')
+cal2 = sympy.symbols('2')
+
+# 正交多项式族
+w = [g[0] * cal0 + g[1] * cal1 + g[2] * cal2 - d[0],
+     g[1] * cal0 + g[2] * cal1 + g[3] * cal2 - d[1],
+     g[2] * cal0 + g[3] * cal1 + g[4] * cal2 - d[2]]
+
+res = sympy.solve(w, [cal0, cal1, cal2])
+b0, b1, b2 = res[cal0], res[cal1], res[cal2]
+
 # 拟合曲线描点
 X = np.arange(0, 1, 0.01)
-Y = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
+
+Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
+plt.plot(x, y, 'ro', X, Y1, 'b')
+plt.title("(a) y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
+
 Y2 = np.array([b0 + b1 * x + b2 * x ** 2 for x in X])
-plt.plot(x, y, 'ro', X, Y)
-plt.plot(x, y, 'ro', X, Y2)
-#plt.title("y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
+plt.plot(x, y, 'ro', X, Y2, 'g')
+plt.title("(b) y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(b0, b1, b2))
 plt.show()
-
-
-##
-'''
-p0(x)=1
-p1(x)=x-a0
-p2(x)=(x-a1)p1(x)-b1p0(x)
-
-a0=
-a1=
-b1=
-'''
