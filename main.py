@@ -8,9 +8,6 @@ y = np.array([1.2, 1.5, 1.7, 2, 2.24, 2.4, 2.75, 3])
 ω = np.array([1, 1, 50, 1, 1, 1, 1, 1])
 
 
-# plt.scatter(x, y, marker='o')
-# plt.show()
-
 # 解方程 AX=b
 # 系数矩阵A
 def gen_coefficient_matrix(X, omega):
@@ -41,6 +38,7 @@ b = gen_right_vector(x, y, ω)
 # print(b)
 
 a0, a1, a2 = np.linalg.solve(A, b)
+print(a0, a1, a2)
 
 
 # 正交多项式
@@ -76,15 +74,19 @@ w = [g[0] * cal0 + g[1] * cal1 + g[2] * cal2 - d[0],
 
 res = sympy.solve(w, [cal0, cal1, cal2])
 b0, b1, b2 = res[cal0], res[cal1], res[cal2]
+print(b0, b1, b2)
 
-# 拟合曲线描点
+# 散点
+plt.scatter(x, y, color='r')
+
+# 拟合曲线画图
 X = np.arange(0, 1, 0.01)
 
-Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
-plt.plot(x, y, 'ro', X, Y1, 'b')
-plt.title("(a) y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(a0, a1, a2))
+# Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
+# plt.plot(X, Y1, color='b')
+# plt.title("(a) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(a2, a1, a0))
 
 Y2 = np.array([b0 + b1 * x + b2 * x ** 2 for x in X])
-plt.plot(x, y, 'ro', X, Y2, 'g')
-plt.title("(b) y = {:.5f} + {:.5f}x + {:.5f}$x^2$ ".format(b0, b1, b2))
+plt.plot(X, Y2, color='g')
+plt.title("(b) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(b2, b1, b0))
 plt.show()
