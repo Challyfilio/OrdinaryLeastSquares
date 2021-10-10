@@ -55,8 +55,8 @@ def MathFunc(x, y, omega):
         gram_list_all.append(gram_list_each)
     for i in range(3):
         t = 0
-        for x_i, f_i, w_i in zip(x, y, omega):
-            t += w_i * (x_i ** i) * f_i
+        for x_i, y_i, w_i in zip(x, y, omega):
+            t += w_i * (x_i ** i) * y_i
         d_list.append(t)
     return gram_list_all, d_list
 
