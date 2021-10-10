@@ -82,9 +82,9 @@ plt.scatter(x, y, color='r')
 # 拟合曲线画图
 X = np.arange(0, 1, 0.01)
 
-# Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
-# plt.plot(X, Y1, color='b')
-# plt.title("(a) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(a2, a1, a0))
+Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
+plt.plot(X, Y1, color='b')
+plt.title("(a) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(a2, a1, a0))
 
 Y2 = np.array([b0 + b1 * x + b2 * x ** 2 for x in X])
 plt.plot(X, Y2, color='g')
