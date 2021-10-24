@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sympy
 
 # data
 x = np.array([0, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
-y = np.array([1.2, 1.5, 1.7, 2, 2.24, 2.4, 2.75, 3])
+y = np.array([1.2, 1.5, 1.7, 2.0, 2.24, 2.4, 2.75, 3.0])
 ω = np.array([1, 1, 50, 1, 1, 1, 1, 1])
+ω0 = np.array([1, 1, 1, 1, 1, 1, 1, 1])
 
 
 # 解方程 AX=b
@@ -34,59 +34,86 @@ def gen_right_vector(X, Y, omega):
 
 A = gen_coefficient_matrix(x, ω)
 b = gen_right_vector(x, y, ω)
+C = gen_coefficient_matrix(x, ω0)
+c = gen_right_vector(x, y, ω0)
 # print(A)
 # print(b)
 
 a0, a1, a2 = np.linalg.solve(A, b)
-print(a0, a1, a2)
+b0, b1, b2 = np.linalg.solve(C, c)
+# print(a0, a1, a2)
+# print(b0, b1, b2)
+
+# 画图
+plt.scatter(x, y, color='r')
+fit_X = np.arange(0, 1, 0.001)
+fit_Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in fit_X])
+fit_Y1b = np.array([b0 + b1 * x + b2 * x ** 2 for x in fit_X])
+plt.plot(fit_X, fit_Y1, label='omega(3)=50')
+plt.plot(fit_X, fit_Y1b, label='omega(3)=1')
+print("S(x) = {:.5f}x^2 + {:.5f}x + {:.5f} ".format(a2, a1, a0))
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.show()
 
 
 # 正交多项式
-def MathFunc(x, y, omega):
-    gram_list_all = []
-    d_list = []
-
-    for i in range(2 * 2 + 1):
-        gram_list_each = 0
-        for x_i, w_i in zip(x, omega):
-            gram_list_each += w_i * (x_i ** i)
-        gram_list_all.append(gram_list_each)
-    for i in range(3):
-        t = 0
-        for x_i, y_i, w_i in zip(x, y, omega):
-            t += w_i * (x_i ** i) * y_i
-        d_list.append(t)
-    return gram_list_all, d_list
+# 计算alpha
+def cal_alpha(x, p, i, omega):
+    temp1 = np.dot(x * p[i - 1], p[i - 1] * omega)
+    temp2 = np.dot(p[i - 1], p[i - 1] * omega)
+    return temp1 / temp2
 
 
-g, d = MathFunc(x, y, ω)
-# print(g)
-# print(d)
+# 计算beta
+def cal_beta(p, i, omega):
+    temp1 = np.dot(p[i - 1], p[i - 1] * omega)
+    temp2 = np.dot(p[i - 2], p[i - 2] * omega)
+    return temp1 / temp2
 
-cal0 = sympy.symbols('0')
-cal1 = sympy.symbols('1')
-cal2 = sympy.symbols('2')
 
-# 正交多项式族
-w = [g[0] * cal0 + g[1] * cal1 + g[2] * cal2 - d[0],
-     g[1] * cal0 + g[2] * cal1 + g[3] * cal2 - d[1],
-     g[2] * cal0 + g[3] * cal1 + g[4] * cal2 - d[2]]
+# 计算P(x)值
+def P(X, alpha, beta, i):
+    if i == 0:
+        return 1  # p0=1
+    if i == 1:
+        return X - alpha[i]  # p1=x-α
+    else:
+        return (X - alpha[i]) * P(X, alpha, beta, i - 1) - beta[i - 1] * P(X, alpha, beta, i - 2)
 
-res = sympy.solve(w, [cal0, cal1, cal2])
-b0, b1, b2 = res[cal0], res[cal1], res[cal2]
-print(b0, b1, b2)
 
-# 散点
+# 正交多项式计算
+def Orthogonal(x, y, omega, n, fit_x):
+    a, p = [], []
+    p.append(np.ones(shape=x.shape))  # p0=1
+    alpha, beta = [0], [0]
+    for i in range(1, n + 1):
+        a.append(np.dot(p[i - 1], y * omega) / np.dot(p[i - 1], p[i - 1] * omega))
+        alpha.append(cal_alpha(x, p, i, omega))
+        if i == 1:
+            p.append(x - alpha[i])
+        else:
+            beta.append(cal_beta(p, i, omega))
+            p.append((x - alpha[i]) * p[i - 1] - beta[i - 1] * p[i - 2])
+        if i == n:
+            a.append(np.dot(p[n], y * omega) / np.dot(p[n], p[n] * omega))
+    # 计算函数值
+    fit_y = []
+    for j in range(len(fit_X)):
+        res = 0
+        for k in range(n + 1):
+            res += a[k] * P(fit_x[j], alpha, beta, k)
+        fit_y.append(res)
+    return fit_y
+
+
+# 画图
 plt.scatter(x, y, color='r')
-
-# 拟合曲线画图
-X = np.arange(0, 1, 0.01)
-
-Y1 = np.array([a0 + a1 * x + a2 * x ** 2 for x in X])
-plt.plot(X, Y1, color='b')
-plt.title("(a) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(a2, a1, a0))
-
-Y2 = np.array([b0 + b1 * x + b2 * x ** 2 for x in X])
-plt.plot(X, Y2, color='g')
-plt.title("(b) y = {:.5f}$x^2$ + {:.5f}x + {:.5f} ".format(b2, b1, b0))
+for m in range(2, 7):  # m次多项式拟合
+    fit_Y2 = Orthogonal(x, y, ω, m, fit_X)
+    plt.plot(fit_X, fit_Y2, label='m=' + str(m))
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
 plt.show()
